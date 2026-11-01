@@ -154,3 +154,129 @@ acquisition-specific appearance.
 
 The order is set by what unblocks the most, not by what is most interesting. RQ1 is a
 single baseline run and it gates the entire project.
+
+## RQ1 — Gates Diagram (Mermaid)
+
+The following mermaid diagram illustrates how RQ1 gates all subsequent research questions:
+
+```mermaid
+flowchart TD
+    %% Research Questions
+    RQ1[RQ1: Baseline degradation under LOSO]
+    RQ2[RQ2: Representation vs data-volume]
+    RQ3[RQ3: Acquisition conditioning]
+    RQ4[RQ4: Deployability (metadata withholding)]
+    RQ5[RQ5: Architecture generality (RT-DETR)]
+    RQ6[RQ6: Efficiency claim accuracy]
+    RQ7[RQ7: Data-efficiency (low-label regime)]
+    %% Gating relationships
+    G1{Gate 1: RQ1 complete?}
+    G2{Gate 2: RQ2 checkpoint available?}
+    G3{Gate 3: RQ3 trained model available?}
+    %% Connections
+    RQ1 -->|blocks| G1
+    G1 -- No -->|BLOCKED-ON-RUN| RQ1
+    G1 -- Yes --> RQ2
+    RQ2 -->|blocks| G2
+    G2 -- No -->|BLOCKED-ON-RUN| RQ2
+    G2 -- Yes --> RQ3
+    RQ3 -->|blocks| G3
+    G3 -- No -->|BLOCKED-ON-RUN| RQ3
+    G3 -- Yes --> RQ4
+    RQ4 -->|blocks| RQ5
+    RQ4 -->|blocks| RQ6
+    RQ4 -->|blocks| RQ7
+    %% GPU requirement note
+    note right of RQ1
+      {
+        \n        • 1-2 h at 512 px, batch 16 on T4-class GPU\n        \n        • Single baseline run gates entire project\n        \n        • All RQ2–RQ7 depend on RQ1 outcome\n      }
+    note right of RQ5
+      {
+        \n        • RT-DETR integration verified\n        \n        • Training-loop integration unfinished\n      }
+```
+
+## RQ6 — Efficiency Claim Status (Mermaid)
+
+The following mermaid diagram summarizes the efficiency claim status:
+
+```mermaid
+flowchart TD
+    %% Cost measured vs accuracy half
+    Cost[Cost: Answered & Measured]
+    Accuracy[Accuracy: BLOCKED-ON-RUN]
+    %% Full release
+    FullRelease[Full Release Training]
+    %% Connection
+    Cost -->|combines measured cost with cited baselines| FullRelease
+    Accuracy -.->|requires GPU + folds| FullRelease
+    %% Note
+    note right of Accuracy
+      {
+        \n        • Cost: 11.016 M params / 32.55 GFLOPs (vs 16.230 M / 55.68 GFLOPs)\n        \n        • Accuracy half: OPEN — needs GPU-resident trained model\n        \n        • Full release numbers in paper/RESULTS.md are TBD\n      }
+```
+
+## RQ7 — Data-Efficiency Claim (Mermaid)
+
+The following mermaid diagram illustrates the data-fraction sweep concept:
+
+```mermaid
+flowchart TD
+    %% Data fractions
+    frac_1[1 % labeled data]
+    frac_5[5 % labeled data]
+    frac_10[10 % labeled data]
+    frac_25[25 % labeled data]
+    frac_50[50 % labeled data]
+    frac_100[100 % labeled data (full)]
+    %% Control
+    ctrl[Same sampling seed & folds across all fractions]
+    %% Conditioning effect
+    cond_no[Conditioning help at 100 %]
+    cond_frac[Relative help at fractions]
+    %% Connections
+    frac_100 --> cond_no
+    frac_50 --> cond_frac
+    frac_25 --> cond_frac
+    frac_10 --> cond_frac
+    frac_5 --> cond_frac
+    frac_1 --> cond_frac
+    ctrl -->|identical across fractions| frac_100
+    ctrl -->|identical across fractions| frac_50
+    ctrl -->|identical across fractions| frac_25
+    ctrl -->|identical across fractions| frac_10
+    ctrl -->|identical across fractions| frac_5
+    ctrl -->|identical across fractions| frac_1
+    %% Notes
+    note right of cond_frac
+      {
+        \n        • Not yet implemented\n        \n        • Would show whether conditioning helps more\n          at lower label regimes\n        \n        • Expected: representation fix should pay off\n          most at low data regimes\n      }
+```
+
+## RQ5 — Architecture Generality (Mermaid)
+
+The following mermaid diagram illustrates the RT-DETR integration concept:
+
+```mermaid
+flowchart TD
+    %% YOLO graph
+    YOLO[YOLO Graph]
+    %% RT-DETR graph
+    RTDETR[RT-DETR Graph]
+    %% Adapter
+    Adapter[Same SSAC adapter]
+    %% Integration
+    IntYolo[SARYOLORTDetectionModel under LOSO]
+    IntRtdetr[RT-DETR under LOSO]
+    %% Control
+    Control[Gate-closed RT-DETR: bit-identical to stock at init]
+    %% Connections
+    YOLO -->|110+ variants| IntYolo
+    RTDETR -->|graph integration verified| IntRtdetr
+    IntYolo -->|comparison| IntRtdetr
+    Control -->|verified| IntRtdetr
+    %% Notes
+    note right of IntRtdetr
+      {
+        \n        • Graph integration verified\n        \n        • Training-loop integration unfinished\n        \n        • No training-loop number can exist yet\n      }
+```
+
