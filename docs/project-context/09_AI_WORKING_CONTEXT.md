@@ -102,7 +102,7 @@ Step 5: Test: pytest tests/test_inference.py -q
 
 #### 3. Running the full test suite
 ```
-Step 1: pytest tests/ -q  # runs 984 core checks (default, excludes slow/gpu)
+Step 1: pytest tests/ -q  # runs 985 core checks (default, excludes slow/gpu)
 Step 2: To include slow: pytest tests/ -q -m "slow"
 Step 3: To include gpu: pytest tests/ -q -m "gpu" (requires CUDA)
 Step 4: Verbose: pytest tests/ -vv to see individual test results
@@ -188,7 +188,7 @@ Step 5: Test: pytest tests/test_ssac.py -q
 **5. Test markers**
 - `slow`: Tests that build large models or run training steps (excluded by default)
 - `gpu`: Tests that require CUDA (excluded from CPU-only runs)
-- By default, only tests without these markers run (984 checks)
+- By default, only tests without these markers run (985 checks)
 
 **6. Exploration ledger**
 - `docs/project-context/08_EXPLORATION_LEDGER.md` tracks every investigated file
@@ -199,7 +199,7 @@ Step 5: Test: pytest tests/test_ssac.py -q
 
 ### Daily Development (core instrument, fastest)
 ```bash
-pytest tests/ -q  # runs 984 checks by default
+pytest tests/ -q  # runs 985 checks by default
 ruff check .  # linting
 ```
 

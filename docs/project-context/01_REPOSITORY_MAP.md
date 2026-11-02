@@ -35,7 +35,7 @@
   configs/             # datasets/, models/ (110 generated), exp/ (EXP-001..019 + ablations + frontier)
   docs/                # physics-to-architecture proposals, method drafts, claim audit
   weights/             # the one committed checkpoint (sarvo_ssac001.pt) with provenance/checksum
-  tests/               # 984 checks; the instrument is tested as hard as the model
+  tests/               # 985 checks; the instrument is tested as hard as the model
   results/             # experiment results (out of git)
   reports/             # reproduction status, defect log
   app.py               # Streamlit demo — draws the pipeline's detections
@@ -66,7 +66,7 @@
 - **Results and claims**: RESULTS.md, claim_evidence_audit.md
 
 ### tests/
-- **984 checks** across multiple categories:
+- **985 checks** across multiple categories:
   - Baseline matching (baseline = stock YOLO11)
   - Every variant builds and forwards
   - Module identity at init
@@ -113,7 +113,7 @@
 |---|---|
 | First-party source files | ~80 |
 | Configuration files | ~20 |
-| Test files | 984+ (pytest checks, many are structural/import checks) |
+| Test files | 985+ (pytest checks, many are structural/import checks) |
 | Documentation files | ~15+ |
 | Asset/data files | ~10+ |
 | Generated/vendor files | results/, runs/, wandb/, mlruns/ |

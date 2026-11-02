@@ -13,7 +13,7 @@ SAR object detection differs fundamentally from RGB detection:
 ## Main Features
 - **110 architecture variants** wired and tested, every one builds and runs a forward pass
 - **134 configured experiments** in the master workflow
-- **984 passing tests** — no dataset download and no GPU needed
+- **985 passing tests** — no dataset download and no GPU needed
 - **Efficiency frontier (SARVO-Lite)** that removes the two dominant compute slots while retaining all physical priors
 - **Exact identity at initialisation**: every custom module is an exact identity at init, so a freshly built SAR-YOLO predicts identically to its stock YOLO11 counterpart
 - **No fabricated numbers**: the ledger is append-only; unmeasured cells render as TBD
@@ -26,7 +26,7 @@ SAR object detection differs fundamentally from RGB detection:
 - **Key dependencies**: torch, numpy, opencv-python, PyYAML, pandas, matplotlib, tqdm, thop, seaborn, pycocotools
 - **CLI framework**: argparse-based saryolo command with 19 subcommands
 - **Demo**: Streamlit web application (app.py)
-- **Testing**: pytest >= 8.0.0 with 984 checks
+- **Testing**: pytest >= 8.0.0 with 985 checks
 
 ## High-Level Architecture
 The project follows a **layered architecture** with these major subsystems:
@@ -83,7 +83,7 @@ The project follows a **layered architecture** with these major subsystems:
 python -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
 
 # Run tests
-pytest tests/ -q  # 984 tests
+pytest tests/ -q  # 985 tests
 
 # Generate YAML variant
 python -m saryolo arch --variant full_s --nc 1 --out configs/models/

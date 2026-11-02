@@ -55,7 +55,7 @@ Do not assume old documentation is always current.
 
 **Daily development** (core instrument, fastest):
 ```bash
-pytest tests/ -q  # runs 984 checks by default
+pytest tests/ -q  # runs 985 checks by default
 ```
 
 **Full quality check**:

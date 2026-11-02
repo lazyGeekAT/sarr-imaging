@@ -171,7 +171,7 @@ The following experiments are documented as blocked in the research questions (`
 - Full HRSID release (5,604 images, 6 classes) requires multiple GPU sessions
 
 **What CAN be done locally (CPU-only):**
-- ✅ Running existing test suite (984 checks pass by default)
+- ✅ Running existing test suite (985 checks pass by default)
 - ✅ Ruff linting (clean)
 - ✅ Verifying documentation consistency (all 11 project-context files)
 - ✅ Codebuff attribution prohibition in AGENTS.md §12

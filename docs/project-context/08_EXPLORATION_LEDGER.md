@@ -488,7 +488,7 @@ Every module implements `forward(x: torch.Tensor) -> torch.Tensor` with:
 ### Test Infrastructure
 
 #### Test Execution Commands
-- `pytest tests/ -q`: 984 core checks (default, excludes slow/gpu)
+- `pytest tests/ -q`: 985 core checks (default, excludes slow/gpu)
 - `pytest tests/ -q -m "slow"`: include slow tests
 - `pytest tests/ -q -m "gpu"`: include gpu tests (requires CUDA)
 - `pytest tests/ -q -m "not (slow or gpu)"`: same as default
@@ -596,13 +596,13 @@ dependencies = [...]  # inferred from requirements.txt
 ## Phase Six: Testing and Quality Investigation ✅
 
 ### Test Architecture (summarized from 06_TESTING_AND_QUALITY.md)
-- 984 core checks pass by default
+- 985 core checks pass by default
 - Markers: `slow`, `gpu`
 - Test files: 58 detected
 - Coverage: All major modules, all modes, identity-at-init, baseline matching
 
 ### Test Commands (actual, verified)
-- `pytest tests/ -q`: 984 checks
+- `pytest tests/ -q`: 985 checks
 - `pytest tests/test_arch.py -q`: architecture builder
 - `pytest tests/test_init.py -q`: module identity
 - `pytest tests/test_ssac.py -q`: SSAC mechanism
@@ -691,8 +691,8 @@ dependencies = [...]  # inferred from requirements.txt
 | Configuration files inspected | 30+ (configs/ directory) |
 | Test files detected | 58 |
 | Documentation files created | 9 (00-08 in project-context/) |
-| Test checks (core, default) | 984 |
-| Test checks (all, excluding slow/gpu) | 984 |
+| Test checks (core, default) | 985 |
+| Test checks (all, excluding slow/gpu) | 985 |
 | Test checks (with slow marker) | variable |
 | Test checks (with gpu marker) | variable |
 | Modules fully inspected (all modes) | 11 (speckle, context, enhancement, cfar, attention, fusion, input_adapter, _common, frequency, target_prior, refinement) |
@@ -712,7 +712,7 @@ dependencies = [...]  # inferred from requirements.txt
 - **All module modes tested for build+forward**: 35+/35+ (100%)
 - **Execution flows reconstructed**: 6/6 major flows (100%)
 - **Configuration items documented**: 80%+ (most config driven by YAML; some narrative gaps)
-- **Test coverage**: 984/984 core checks passing (100% of default instrument)
+- **Test coverage**: 985/985 core checks passing (100% of default instrument)
 - **Execution flow audit**: 100% (all entry points and major flows examined)
 - **Documentation consistency**: 95%+ (minor gaps in narrative explanation, not factual errors)
 

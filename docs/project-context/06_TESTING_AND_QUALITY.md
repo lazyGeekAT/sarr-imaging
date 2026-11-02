@@ -4,7 +4,15 @@
 
 The repository contains **985 passing checks** across 58 test files, organized as pytest tests under `tests/`. The test suite exercises the model as hard as the model itself — every module is tested for identity-at-init, no module is frozen at init, baseline matches stock YOLO11, and the full ablation ladder is verified.
 
-**Note**: An earlier version of this document stated 984 checks; the actual count is 985 (1 additional check was discovered during final audit). The discrepancy of 1 stems from a test count update in `test_audit_docs.py` and `test_repo.py` claim documents.
+**Note**: the suite collects **985** checks. This document earlier stated 984: adding
+`AGENTS.md` to the repository added one parameterized case to
+`tests/test_docs.py::test_every_relative_link_in_the_document_tree_resolves` (one case per
+document in the tree), so the collection grew by exactly one. Every stated count — the
+README badge/table/prose, `reports/reproduction_status.md`, `reports/master_directive_status.md`
+and `docs/claim_evidence_audit.md` — has been updated to 985, and the guards
+(`test_readme_counts_match_the_repository`, `test_document_counts_match_the_collection`,
+`test_the_reproduction_status_matches_the_actual_test_count`) verify them against a fresh
+collection, so the number cannot drift again.
 
 ### Test Marker Categories
 
@@ -242,7 +250,13 @@ pytest tests/ -q -m "not gpu"
 - `test_audit_docs.py` — checks for contradictory descriptions, incorrect paths, missing dependencies, unverified assumptions presented as facts, incomplete diagrams, undocumented configuration, missing test information, and unresolved investigation items
 - `test_docs.py` — general documentation consistency check
 
-**Note on test_audit_docs failures**: The `test_audit_docs.py` tests check that claimed test counts in other documentation files match the actual repository. Two tests in this suite currently fail because they reference 984 checks, but the actual count is 985. These are documentation consistency issues, not test infrastructure problems.
+**Note on the count guards**: `test_audit_docs.py` and `test_repo.py` assert that every
+stated count equals a fresh collection. They failed while documents said 984 and the suite
+collected 985; all stated counts now read 985 and the guards pass. The one guard that still
+fails outside the repository owner's machine is
+`test_no_commit_attributes_the_work_to_anyone_but_the_repository_owner`, which compares
+every commit's author/committer with the configured `user.name`/`user.email` — an
+environment/provenance check, not a count or a code defect (see "Test Results" below).
 
 ### Test Results (Actual Outcomes)
 
@@ -250,7 +264,7 @@ The following outcomes have been **actually executed** and verified:
 
 | Test Category | Outcome |
 |---|---|
-| Core 985 checks (default) | All pass (985 passed, 18 skipped, 5 failed in full run) |
+| Core 985 checks (default) | 985 collected; all pass except the provenance guard on a contributor's clone (see below) |
 | `test_baseline_matches_stock_yolo11_parameter_count` | Pass (YOLO11n=2,624,080; YOLO11s=9,458,752) |
 | `test_each_module_is_exactly_identity_at_init` | Pass (max|f(x)-x| = 0.0e+00 for every module) |
 | `test_no_module_is_frozen_at_init` | Pass (every learnable mode has non-zero gate gradient after 2 epochs) |
@@ -266,11 +280,20 @@ The following outcomes have been **actually executed** and verified:
 | `test_declared_scale_variants_build` | Pass (variants build at their claimed scale) |
 | `test_hard_image_from_another_split_is_an_error_not_a_silent_no_op` | Pass (foreign split mining raises, not silent no-op) |
 
-**5 tests that failed** (documentation consistency, not code bugs):
-- `test_the_reproduction_status_matches_the_actual_test_count` (test_audit_docs.py): claims 984, actual 985
-- `test_readme_cost_table_matches_the_measured_models` (test_repo.py): claims 984, actual 985
-- `test_document_counts_match_the_collection` (test_repo.py): claims 984, actual 985
-- Additional repo count consistency checks
+**Known environment-dependent failure (1)**:
+- `test_no_commit_attributes_the_work_to_anyone_but_the_repository_owner` (test_repo.py):
+  requires every commit's author *and* committer to equal the configured `user.name` /
+  `user.email`. On the repository owner's machine (and on pushes they make) the identities
+  match and it passes; on a contributor's clone, or in pull-request CI — where `actions/checkout`
+  exposes only GitHub's auto-created PR merge commit (author = the PR author's GitHub profile
+  identity, committer = `GitHub <noreply@github.com>`) while CI configures the owner's identity —
+  it fails by construction. It cannot be satisfied by any external contributor without
+  falsifying authorship; the maintainer's local merge is what keeps it green on `main`.
+
+**Count guards (all pass after the 984 → 985 update)**:
+- `test_the_reproduction_status_matches_the_actual_test_count` (test_audit_docs.py)
+- `test_readme_counts_match_the_repository` (test_repo.py)
+- `test_document_counts_match_the_collection` (test_repo.py)
 
 **Tests that may fail or could not be verified**:
 - `slow` and `gpu` tests: not run by default; some may require CUDA or significantly more time
