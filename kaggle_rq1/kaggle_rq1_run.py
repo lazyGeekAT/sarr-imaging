@@ -18,6 +18,7 @@ import time
 from pathlib import Path
 
 import torch
+import yaml
 
 # Force unbuffered output so stdout streams live to the Kaggle web log
 os.environ["PYTHONUNBUFFERED"] = "1"
@@ -108,7 +109,7 @@ elif torch.cuda.is_available():
 else:
     DEVICE = "cpu"
 
-EXP_CONFIG = repo_dir / "configs/exp/EXP-001_baseline.yaml"
+MODEL_YAML = repo_dir / "configs/models/yolo11s_baseline.yaml"
 
 print(f"⚙️  Settings: epochs={EPOCHS}, batch={BATCH}, imgsz={IMGSZ}, device={DEVICE}")
 
@@ -148,61 +149,66 @@ for i, exp in enumerate(experiments_to_run):
     print(f"Data config: {data_path}")
     print("=" * 70)
 
-    overrides = {
-        "data": exp["data_yaml"],
-        "epochs": EPOCHS,
-        "batch": BATCH,
-        "imgsz": IMGSZ,
-        "name": exp_id,
-        "device": DEVICE,
-        "project": str(runs_out / "runs"),
-        "seed": 0,
-        "deterministic": True,
+    # Build dedicated experiment YAML for this run
+    exp_dict = {
+        "experiment": {
+            "id": exp_id,
+            "name": desc,
+            "description": desc,
+        },
+        "model": str(MODEL_YAML),
+        "dataset": data_path,
+        "train": {
+            "epochs": EPOCHS,
+            "batch": BATCH,
+            "imgsz": IMGSZ,
+            "seed": 0,
+            "workers": 4,
+            "deterministic": True,
+            "patience": 30,
+            "cos_lr": True,
+            "val": True,
+            "plots": True,
+        },
     }
 
+    cfg_file = runs_out / f"{exp_id}.yaml"
+    with open(cfg_file, "w") as f:
+        yaml.safe_dump(exp_dict, f, sort_keys=False)
+
     t0 = time.time()
-    try:
-        record = run_experiment(
-            EXP_CONFIG,
-            ledger_root=runs_out,
-            project=runs_out / "runs",
-            device=DEVICE,
-            extra_overrides=overrides,
-            validate_after=True,
-            efficiency=True,
-            skip_ledger=False,
-        )
-        elapsed = time.time() - t0
-        print(f"\n✅ {exp_id} finished in {elapsed:.1f}s with status: {record.status}")
-        metrics = record.metrics or {}
-        map50_str = str(metrics.get("mAP50", "N/A"))
-        map_str = str(metrics.get("mAP50_95", "N/A"))
-        prec_str = str(metrics.get("precision", "N/A"))
-        rec_str = str(metrics.get("recall", "N/A"))
-        print(f"   mAP50:    {map50_str}")
-        print(f"   mAP50-95: {map_str}")
-        print(f"   Precision:{prec_str}")
-        print(f"   Recall:   {rec_str}")
-        results.append({
-            "id": exp_id,
-            "held_out_source": exp["held_out_source"],
-            "status": record.status,
-            "elapsed_seconds": round(elapsed, 2),
-            "metrics": metrics,
-        })
-    except Exception as exc:
-        elapsed = time.time() - t0
-        print(f"\n❌ {exp_id} failed after {elapsed:.1f}s: {exc}")
-        import traceback
-        traceback.print_exc()
-        results.append({
-            "id": exp_id,
-            "held_out_source": exp["held_out_source"],
-            "status": "failed",
-            "error": str(exc),
-            "elapsed_seconds": round(elapsed, 2),
-            "metrics": {},
-        })
+    record = run_experiment(
+        cfg_file,
+        ledger_root=runs_out,
+        project=runs_out / "runs",
+        device=DEVICE,
+        validate_after=True,
+        efficiency=True,
+        skip_ledger=False,
+    )
+    elapsed = time.time() - t0
+    print(f"\nStatus: {record.status} (elapsed: {elapsed:.1f}s)")
+    if record.status != "completed":
+        print(f"❌ Notes / Failure Reason: {record.notes}")
+
+    metrics = record.metrics or {}
+    map50_str = str(metrics.get("mAP50", "N/A"))
+    map_str = str(metrics.get("mAP50_95", "N/A"))
+    prec_str = str(metrics.get("precision", "N/A"))
+    rec_str = str(metrics.get("recall", "N/A"))
+    print(f"   mAP50:    {map50_str}")
+    print(f"   mAP50-95: {map_str}")
+    print(f"   Precision:{prec_str}")
+    print(f"   Recall:   {rec_str}")
+
+    results.append({
+        "id": exp_id,
+        "held_out_source": exp["held_out_source"],
+        "status": record.status,
+        "elapsed_seconds": round(elapsed, 2),
+        "metrics": metrics,
+        "notes": record.notes,
+    })
 
 # ── Step 5: RQ1 Synthesis & Aggregate Output ───────────────────────────────
 print("\n" + "=" * 70)
