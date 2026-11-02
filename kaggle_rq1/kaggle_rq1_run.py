@@ -84,20 +84,55 @@ if dataset_root is None:
 
 print(f"📁 Dataset root: {dataset_root}")
 
-# Verify data YAML files
+runs_out = Path("/kaggle/working/results") if Path("/kaggle/working").is_dir() else Path("results")
+runs_out.mkdir(parents=True, exist_ok=True)
+
+# ── Step 3: Prepare Data Configs with Absolute Paths ───────────────────────
 data_configs = {
     "indomain": dataset_root / "ssdd_official.yaml",
-    "inshore_heldout": dataset_root / "ssdd_inshore_heldout.yaml",
-    "offshore_heldout": dataset_root / "ssdd_offshore_heldout.yaml",
 }
 
-for name, path in data_configs.items():
-    if not path.is_file():
-        print(f"❌ Missing dataset YAML for {name}: {path}")
-        sys.exit(1)
-    print(f"   Found config for {name}: {path}")
+# For scenery splits, write absolute-path text files so Ultralytics resolves them anywhere
+resolved_splits_dir = runs_out / "splits"
+resolved_splits_dir.mkdir(parents=True, exist_ok=True)
 
-# ── Step 3: Run Configuration ──────────────────────────────────────────────
+for fold in ["inshore", "offshore"]:
+    fold_dir = resolved_splits_dir / fold
+    fold_dir.mkdir(parents=True, exist_ok=True)
+    fold_paths = {}
+    for split in ["train", "val", "test"]:
+        src_txt = dataset_root / f"splits/ssdd_scenery/{fold}/{split}.txt"
+        lines = [ln.strip() for ln in src_txt.read_text().splitlines() if ln.strip()]
+        abs_lines = []
+        for ln in lines:
+            if ln.startswith(str(dataset_root)):
+                abs_lines.append(ln)
+            else:
+                idx = ln.find("images/")
+                rel = ln[idx:] if idx != -1 else ln
+                abs_lines.append(str(dataset_root / rel))
+        dst_txt = fold_dir / f"{split}.txt"
+        dst_txt.write_text("\n".join(abs_lines) + "\n")
+        fold_paths[split] = str(dst_txt)
+
+    # Generate data yaml with absolute txt paths
+    train_txt = fold_paths["train"]
+    val_txt = fold_paths["val"]
+    test_txt = fold_paths["test"]
+    yaml_content = f"""path: {dataset_root}
+train: {train_txt}
+val: {val_txt}
+test: {test_txt}
+nc: 1
+names:
+  - ship
+"""
+    yaml_file = runs_out / f"ssdd_{fold}_heldout.yaml"
+    yaml_file.write_text(yaml_content)
+    data_configs[f"{fold}_heldout"] = yaml_file
+    print(f"   Generated data YAML for {fold}_heldout: {yaml_file}")
+
+# ── Step 4: Run Configuration ──────────────────────────────────────────────
 EPOCHS = int(os.environ.get("EPOCHS", "50"))
 BATCH = int(os.environ.get("BATCH", "16"))
 IMGSZ = int(os.environ.get("IMGSZ", "512"))
@@ -112,9 +147,6 @@ else:
 MODEL_YAML = repo_dir / "configs/models/yolo11s_baseline.yaml"
 
 print(f"⚙️  Settings: epochs={EPOCHS}, batch={BATCH}, imgsz={IMGSZ}, device={DEVICE}")
-
-runs_out = Path("/kaggle/working/results") if Path("/kaggle/working").is_dir() else Path("results")
-runs_out.mkdir(parents=True, exist_ok=True)
 
 experiments_to_run = [
     {
@@ -137,7 +169,7 @@ experiments_to_run = [
     },
 ]
 
-# ── Step 4: Execute Experiments ────────────────────────────────────────────
+# ── Step 5: Execute Experiments ────────────────────────────────────────────
 results = []
 for i, exp in enumerate(experiments_to_run):
     exp_id = exp["id"]
@@ -210,7 +242,7 @@ for i, exp in enumerate(experiments_to_run):
         "notes": record.notes,
     })
 
-# ── Step 5: RQ1 Synthesis & Aggregate Output ───────────────────────────────
+# ── Step 6: RQ1 Synthesis & Aggregate Output ───────────────────────────────
 print("\n" + "=" * 70)
 print("RQ1 ANALYSIS AND SYNTHESIS")
 print("=" * 70)
