@@ -42,18 +42,22 @@ if not repo_dir.exists():
             check=True,
         )
 
+# Install ultralytics and dependencies
+print("📦 Installing ultralytics and dependencies...")
+subprocess.run(
+    [sys.executable, "-m", "pip", "install", "-q", "ultralytics>=8.3.0", "pycocotools>=2.0.7"],
+    check=True,
+)
+
 # Ensure repo root is on sys.path and install package in editable mode
 if str(repo_dir) not in sys.path:
     sys.path.insert(0, str(repo_dir))
 
-try:
-    import saryolo
-    print(f"✅ saryolo package imported successfully from {saryolo.__file__}")
-except ImportError:
-    print("📦 Installing saryolo in editable mode...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", str(repo_dir)], check=True)
-    import saryolo
-    print(f"✅ saryolo installed and imported from {saryolo.__file__}")
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", str(repo_dir)], check=True)
+
+import saryolo  # noqa: E402
+
+print(f"✅ saryolo package imported successfully from {saryolo.__file__}")
 
 from saryolo.training.runner import run_experiment  # noqa: E402
 
