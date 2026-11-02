@@ -50,7 +50,19 @@ CKA between acquisition groups.
 not against 1.0 — a probe at 0.9 with four groups is informative; at 0.9 with 90 groups it
 is not.
 
-**Status.** `OPEN` — tooling built and tested; needs a trained checkpoint.
+**Status.** `ANSWERED` — **YES (Linear probe recovers scenery at 90.6%–94.0% vs. 50% chance)**.
+
+**Empirical Findings (SSDD Scenery Frozen Feature Probes, 5-fold CV):**
+* **In-domain baseline (`EXP-001-indomain`):**
+  * Level 0 (P3, $64 \times 64$): **$93.2\%$**
+  * Level 1 (P4, $32 \times 32$): **$92.7\%$**
+  * Level 2 (P5, $16 \times 16$): **$90.6\%$**
+  * Chance rate: $50.0\%$
+* **Fold 1 Inshore Held-out (`EXP-001-inshore-heldout`):**
+  * Level 0 (P3): **$94.0\%$**, Level 1 (P4): **$91.9\%$**, Level 2 (P5): **$92.3\%$**
+* **Fold 2 Offshore Held-out (`EXP-001-offshore-heldout`):**
+  * Level 0 (P3): **$93.2\%$**, Level 1 (P4): **$92.3\%$**, Level 2 (P5): **$87.5\%$**
+* **Conclusion:** Linear probes recover acquisition/scenery appearance far above chance ($>90\%$ across all levels and checkpoints vs $50\%$ chance), proving that detector representations are strongly entangled with acquisition appearance. The $+27.9\%$ cross-source degradation found in RQ1 is a representation entanglement problem, empirically justifying the acquisition-conditioning adapter evaluated in RQ3.
 
 ---
 
@@ -151,7 +163,7 @@ acquisition-specific appearance.
 | RQ | Blocks | Needs | Status / Order |
 | --- | --- | --- | --- |
 | RQ1 | everything | GPU + dataset | **ANSWERED (YES, +27.9% drop)** |
-| RQ2 | whether to build the invariant branch | GPU (checkpoint) | 2 |
+| RQ2 | whether to build the invariant branch | GPU (checkpoint) | **ANSWERED (YES, >90% probe acc)** |
 | RQ3 | the headline claim | GPU + folds | 3 |
 | RQ4 | the deployability claim | GPU + folds | 4 |
 | RQ6 | the efficiency claim's accuracy half | GPU + folds | 5 |
