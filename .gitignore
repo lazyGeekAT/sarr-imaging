@@ -20,7 +20,9 @@ configs/datasets/generated/
 # ---- Datasets (never commit raw SAR data) ----
 datasets/raw/**
 datasets/processed/**
+datasets/staging/**
 datasets/splits/**
+downloads/
 !datasets/**/.gitkeep
 !datasets/**/README.md
 

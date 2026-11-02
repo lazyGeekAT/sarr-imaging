@@ -1,0 +1,41 @@
+kernel:
+  id: lazyGeekAT/rq1-baseline-loso
+  title: "RQ1 Baseline — LOSO Degradation"
+  acl: private
+  enable_gpu: true
+  enable_internet: true
+  dataset_access: true
+  kernel_type: python
+  python_version: python3
+  hardware: T4
+  vocab_size: 0
+  given_name: lazyGeekAT
+  aconfig:
+    - kaggle
+    - kernel
+  secret: ~
+  aicode:
+    skip_submit: false
+  dataset_slugs: []
+  model_slugs: []
+  competition_slugs: []
+  network_speed: ~
+  kernel_size: ~
+  network_volume_size: ~
+  input_data_volume_size: ~
+  network_volume_type: ~
+  input_data_volume_type: ~
+  volume_size: ~
+  network_volume_size_gb: ~
+  input_data_volume_size_gb: ~
+  max_session_time: 120
+  max_seconds: 3600
+  max_steps: 0
+  enable_code_formatting: true
+  enable_command_runner: true
+  # Files to include
+  file_aliases:
+    "/kaggle_rq1_run.py": "kaggle_rq1_run.py"
+    "/kaggle_rq1_baseline.ipynb": "kaggle_rq1_baseline.ipynb"
+    "/rq1_aggregate.json": "rq1_aggregate.json"
+    "/results": "results"
