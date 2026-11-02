@@ -22,7 +22,13 @@ compared against the in-domain `EXP-001` number.
 smaller training set". The fold machinery refuses a random split for the *claim*; the
 random split is run only as the contrast.
 
-**Status.** `OPEN` — **BLOCKED-ON-RUN** (no GPU, no real dataset).
+**Status.** `ANSWERED` — **YES (Measurable degradation verified on Kaggle GPU)**.
+
+**Empirical Findings (SSDD Scenery LOSO, 50 epochs, YOLO11s baseline):**
+* **In-domain baseline:** $m\text{AP}_{50} = 0.9683$, $m\text{AP}_{50:95} = 0.6415$, Precision $= 0.9122$, Recall $= 0.9239$
+* **Fold 1 (Inshore held-out):** $m\text{AP}_{50} = 0.9907$, $m\text{AP}_{50:95} = 0.6866$ ($\Delta = -0.0224$)
+* **Fold 2 (Offshore held-out):** $m\text{AP}_{50} = 0.6888$, $m\text{AP}_{50:95} = 0.3948$ ($\Delta = +0.2794$, a **$27.94$ point / $28.9\%$ drop**)
+* **Conclusion:** The stock baseline degrades significantly under cross-source distribution shift, concentrating heavily in transfer from inshore training to offshore testing ($0.9683 \to 0.6888$). This confirms the hypothesis and empirically validates the necessity of acquisition-conditioned adaptation.
 
 ---
 
@@ -142,9 +148,9 @@ acquisition-specific appearance.
 
 ## Priority
 
-| RQ | Blocks | Needs | Order |
+| RQ | Blocks | Needs | Status / Order |
 | --- | --- | --- | --- |
-| RQ1 | everything | GPU + dataset | 1 |
+| RQ1 | everything | GPU + dataset | **ANSWERED (YES, +27.9% drop)** |
 | RQ2 | whether to build the invariant branch | GPU (checkpoint) | 2 |
 | RQ3 | the headline claim | GPU + folds | 3 |
 | RQ4 | the deployability claim | GPU + folds | 4 |

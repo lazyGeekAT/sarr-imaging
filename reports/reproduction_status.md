@@ -214,7 +214,7 @@ would have caught it is `tests/test_peft.py::test_a_lora_arm_end_to_end_trains_a
 | Architecture cost | ✅ all | — |
 | Accuracy on real SAR | ✅ pilot, 3 arms, subset of HRSID | full benchmark + ladder |
 | Adaptation comparison (LoRA) | ✅ pilot, one rank | rank/scale sweep |
-| Generalisation (LOSO, cross-sensor, cross-resolution) | ❌ none | GPU + multi-source dataset |
+| Generalisation (LOSO, scenery cross-source) | ✅ reproduced on Kaggle GPU (RQ1 answered) | cross-sensor + cross-resolution |
 
 The honest one-line status: **the instrument is verified, and a real pilot has now been measured
 on a subset -- which is a beginning, not the paper's result.**

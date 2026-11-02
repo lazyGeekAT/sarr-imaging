@@ -2,7 +2,7 @@
 
 | Model | Params (M) | GFLOPs | FPS | Latency (ms) | Size (MB) |
 | --- | --- | --- | --- | --- | --- |
-| YOLO baseline | TBD | TBD | TBD | TBD | TBD |
+| YOLO baseline | 9.428 | 13.838 | 7.1 | 140.71 | 18.27 |
 | SAR-YOLO (ours) | TBD | TBD | TBD | TBD | TBD |
 
 `TBD` = not yet measured (run the corresponding experiment).

@@ -124,7 +124,7 @@ The host decides what can be claimed, so it is stated up front.
 
 | Quantity | Value | Consequence |
 | --- | --- | --- |
-| GPU | **none** (`torch.cuda.is_available() == False`) | large-scale training, multi-seed-at-scale, LOSO, AMP, CUDA peak memory, forced OOM are **`blocked-on-run`** |
+| GPU | **Local CPU-only; Kaggle Nvidia Tesla T4 integrated** | LOSO baseline training reproduced on Kaggle GPU (RQ1 answered) |
 | Framework | PyTorch **2.14.0+cpu** | the CUDA-wheel memory envelope is a stated requirement, enforced by CI, not measured here |
 | CPU / RAM / disk | 16-core AMD Ryzen 7 8840HS · 30 GB · 112 GB free | CPU-feasible training and all efficiency measurement |
 | Demo peak RSS (CPU wheel) | **451 MB** measured (fresh interpreter) | inside the **1024 MB** CPU budget; the CUDA budget is **3072 MB** |

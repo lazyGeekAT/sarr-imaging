@@ -2,7 +2,7 @@
 
 | Model | mAP50 | mAP50:95 | Precision | Recall | Params (M) | GFLOPs | FPS |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| YOLO11 baseline | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
+| YOLO11 baseline | 0.9683 | 0.6415 | 0.9122 | 0.9239 | 9.428 | 13.838 | 7.1 |
 | SAR-YOLO (ours) | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
 
 `TBD` = not yet measured (run the corresponding experiment).
