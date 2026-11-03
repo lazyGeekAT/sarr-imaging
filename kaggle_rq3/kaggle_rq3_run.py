@@ -184,34 +184,11 @@ acquisition_metadata: {metadata_json.resolve()}
     data_configs[f"{fold}_heldout"] = yaml_file
     print(f"   Generated conditioned data YAML for {fold}_heldout: {yaml_file}")
 
-# 2. In-domain reference data YAML
-official_train = dataset_root / "splits/ssdd_official/train.txt"
-official_val = dataset_root / "splits/ssdd_official/val.txt"
-official_test = dataset_root / "splits/ssdd_official/test.txt"
-
-def resolve_split_txt(src_path, dst_path):
-    lines = [ln.strip() for ln in src_path.read_text().splitlines() if ln.strip()]
-    abs_lines = []
-    for ln in lines:
-        if ln.startswith(str(dataset_root)):
-            abs_lines.append(ln)
-        else:
-            idx = ln.find("images/")
-            rel = ln[idx:] if idx != -1 else ln
-            abs_lines.append(str(dataset_root / rel))
-    dst_path.write_text("\n".join(abs_lines) + "\n")
-    return str(dst_path)
-
-indomain_dir = resolved_splits_dir / "indomain"
-indomain_dir.mkdir(parents=True, exist_ok=True)
-train_abs = resolve_split_txt(official_train, indomain_dir / "train.txt")
-val_abs = resolve_split_txt(official_val, indomain_dir / "val.txt")
-test_abs = resolve_split_txt(official_test, indomain_dir / "test.txt")
-
+# 2. In-domain reference data YAML (uses standard images/train, images/val, images/test dirs)
 indomain_yaml = f"""path: {dataset_root}
-train: {train_abs}
-val: {val_abs}
-test: {test_abs}
+train: images/train
+val: images/val
+test: images/test
 nc: 1
 names:
   - ship

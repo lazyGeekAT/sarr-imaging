@@ -266,6 +266,9 @@ class SARAwareDetectionLoss(v8DetectionLoss):
                                feats: list[torch.Tensor]) -> torch.Tensor:
         """Total-variation penalty on background-masked score maps (suppresses speckle spikes)."""
         b = pred_scores_ba.shape[0]
+        # Map logits to [0, 1] confidence probabilities so negative background logits
+        # do not produce artificial step-discontinuities at foreground/background boundaries.
+        probs = pred_scores_ba.sigmoid()
         total = pred_scores_ba.sum() * 0.0
         offset, n_levels = 0, 0
         for feat in feats:
@@ -273,7 +276,7 @@ class SARAwareDetectionLoss(v8DetectionLoss):
             n = h * w
             if offset + n > pred_scores_ba.shape[1]:
                 break
-            score_map = pred_scores_ba[:, offset:offset + n, :].mean(-1).view(b, 1, h, w)
+            score_map = probs[:, offset:offset + n, :].mean(-1).view(b, 1, h, w)
             bg = (~fg[:, offset:offset + n]).view(b, 1, h, w).to(score_map.dtype)
             sm = score_map * bg  # regularise background only
             total = total + (sm[..., 1:, :] - sm[..., :-1, :]).abs().mean()
