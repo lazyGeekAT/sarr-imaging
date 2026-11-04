@@ -316,6 +316,7 @@ for i, exp in enumerate(experiments_to_run):
             "cos_lr": True,
             "val": True,
             "plots": True,
+            "amp": False,
         },
     }
 

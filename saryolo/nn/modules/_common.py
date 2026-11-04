@@ -118,10 +118,13 @@ class LocalStats(nn.Module):
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Return ``(mu, var, sd, highpass)``."""
-        mu = self.pool(x)
-        var = (self.pool(x * x) - mu * mu).clamp_min(0.0)
+        dtype = x.dtype
+        compute = x if dtype in (torch.float32, torch.float64) else x.float()
+        mu = self.pool(compute)
+        var = (self.pool(compute * compute) - mu * mu).clamp_min(0.0)
         sd = torch.sqrt(var + self.eps)
-        return mu, var, sd, x - mu
+        hp = compute - mu
+        return mu.to(dtype), var.to(dtype), sd.to(dtype), hp.to(dtype)
 
 
 class ChannelDescriptor(nn.Module):
@@ -134,11 +137,14 @@ class ChannelDescriptor(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, c = x.shape[:2]
-        flat = x.flatten(2)
+        dtype = x.dtype
+        compute = x if dtype in (torch.float32, torch.float64) else x.float()
+        flat = compute.flatten(2)
         avg = flat.mean(-1)
         mx = flat.amax(-1)
         std = flat.std(-1, unbiased=False)
-        return torch.cat((avg, mx, std), dim=1).view(b, 3 * c)
+        out = torch.cat((avg, mx, std), dim=1).view(b, 3 * c)
+        return out.to(dtype)
 
 
 def interp_weights(radius: torch.Tensor, bands: int) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
