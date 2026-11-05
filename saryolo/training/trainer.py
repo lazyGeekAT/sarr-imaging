@@ -345,7 +345,17 @@ class AcquisitionDetectionValidator(DetectionValidator):
             # the frozen vocabularies from it and ``init_metrics`` can install the real module.
             self._metadata_checkpoint = model if isinstance(model, (str, Path)) else None
             self._metadata_model = _native_module(model)
-        return super().__call__(trainer=trainer, model=model, **kwargs)
+        if self._metadata_model is not None:
+            ctx = getattr(self._metadata_model, "metadata_context", None)
+            if ctx is not None:
+                ctx.clear()
+        try:
+            return super().__call__(trainer=trainer, model=model, **kwargs)
+        finally:
+            if self._metadata_model is not None:
+                ctx = getattr(self._metadata_model, "metadata_context", None)
+                if ctx is not None:
+                    ctx.clear()
 
     def init_metrics(self, model):
         """Capture the module the inference pass really uses, before any batch is preprocessed.
@@ -511,18 +521,22 @@ class SARYOLOTrainer(DetectionTrainer):
         adapted-wrapped EMA to disk. The merge is a context manager, so the adapters are put
         back afterwards and training continues on the same parameters.
         """
-        if not self._peft_summary:
-            return super().save_model()
-        from contextlib import ExitStack
-
         from ultralytics.utils.torch_utils import unwrap_model
-
-        from .peft import adapter_merged
 
         targets = [unwrap_model(self.model)]
         ema_model = getattr(getattr(self, "ema", None), "ema", None)
         if ema_model is not None:
             targets.append(ema_model)
+        for target in targets:
+            context = getattr(target, "metadata_context", None)
+            if context is not None:
+                context.clear()
+
+        if not self._peft_summary:
+            return super().save_model()
+        from contextlib import ExitStack
+
+        from .peft import adapter_merged
         with ExitStack() as stack:
             merged = sum(stack.enter_context(adapter_merged(target)) for target in targets)
             if not merged:

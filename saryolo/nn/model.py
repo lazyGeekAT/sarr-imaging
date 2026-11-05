@@ -136,6 +136,13 @@ class SARYOLODetectionModel(DetectionModel):
         # builds the layers, because the layers are what we are walking.
         self.n_conditioned_adapters = attach_metadata_context(self)
 
+    def warmup(self, imgsz=(1, 3, 640, 640)):
+        """Clear transient batch metadata context during dummy warmup passes."""
+        ctx = getattr(self, "metadata_context", None)
+        if ctx is not None:
+            ctx.clear()
+        return super().warmup(imgsz=imgsz)
+
     def init_criterion(self):
         """Return the SAR-aware criterion, using the YAML ``sar_loss`` block if present."""
         # During training the Ultralytics trainer attaches `args` (the resolved

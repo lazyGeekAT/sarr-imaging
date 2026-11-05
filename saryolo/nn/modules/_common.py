@@ -27,6 +27,7 @@ resolve width-scaled channels exactly at build time for any ``scale``/``width_mu
 from __future__ import annotations
 
 import torch
+import torch.nn.functional as F
 from torch import nn
 
 __all__ = [
@@ -82,7 +83,21 @@ class ConvBNAct(nn.Module):
         self.act = nn.SiLU(inplace=True) if act else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.act(self.bn(self.conv(x)))
+        out = self.conv(x)
+        if self.training and out.numel() // out.shape[1] == 1:
+            return self.act(
+                F.batch_norm(
+                    out,
+                    self.bn.running_mean,
+                    self.bn.running_var,
+                    self.bn.weight,
+                    self.bn.bias,
+                    False,
+                    self.bn.momentum,
+                    self.bn.eps,
+                )
+            )
+        return self.act(self.bn(out))
 
 
 class DWConvBNAct(nn.Module):
@@ -97,7 +112,21 @@ class DWConvBNAct(nn.Module):
         self.act = nn.SiLU(inplace=True) if act else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.act(self.bn(self.pw(self.dw(x))))
+        out = self.pw(self.dw(x))
+        if self.training and out.numel() // out.shape[1] == 1:
+            return self.act(
+                F.batch_norm(
+                    out,
+                    self.bn.running_mean,
+                    self.bn.running_var,
+                    self.bn.weight,
+                    self.bn.bias,
+                    False,
+                    self.bn.momentum,
+                    self.bn.eps,
+                )
+            )
+        return self.act(self.bn(out))
 
 
 class LocalStats(nn.Module):

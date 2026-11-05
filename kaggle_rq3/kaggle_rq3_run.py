@@ -360,6 +360,11 @@ for i, exp in enumerate(experiments_to_run):
         "notes": record.notes,
     })
 
+    import gc
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
 # ── Step 7: RQ3 Analysis & Synthesis ───────────────────────────────────────
 print("\n" + "=" * 70)
 print("RQ3 ANALYSIS AND SCIENTIFIC SYNTHESIS")
